@@ -492,7 +492,6 @@ def _get_stats(df):
 
 stats = _get_stats(df_raw)
 
-# ─── PERBAIKAN: get_plotly_layout menggantikan DARK_LAYOUT & LIGHT_LEGEND ────
 def get_plotly_layout(extra: dict = {}) -> dict:
     is_dark = st.get_option("theme.base") == "dark"
 
@@ -571,7 +570,6 @@ if page == "🏠 Overview":
     with col3: st.metric("Akurasi Terbaik", "83.5%", "✅ Tercapai")
     with col4: st.metric("F1-Score Macro", "0.8598", "✅ ≥ 0.75")
 
-    # ── PERBAIKAN Masalah 4: card info file dataset pakai CSS variables ──────
     if df_raw is not None:
         r, c = df_raw.shape
         ci1, ci2, ci3, ci4 = st.columns(4)
@@ -768,7 +766,6 @@ elif page == "📊 Distribusi Data":
         'Jumlah':  list(label_dist.values()),
     }).sort_values('Jumlah', ascending=True)
 
-    # ── PERBAIKAN Masalah 1: ganti **DARK_LAYOUT → get_plotly_layout() ──────
     fig = px.bar(
         df_dist, x='Jumlah', y='Kondisi', orientation='h',
         color='Jumlah', color_continuous_scale='Blues',
@@ -828,7 +825,6 @@ elif page == "📊 Distribusi Data":
                    annotation_text=f"Median: {_median}", annotation_position="top right")
     fig2.add_vline(x=_mean,   line_dash="dot",  line_color="#45B7D1",
                    annotation_text=f"Mean: {_mean}",   annotation_position="top left")
-    # ── PERBAIKAN Masalah 1 ──────────────────────────────────────────────────
     fig2.update_layout(**get_plotly_layout(extra=dict(
         title=_title,
         xaxis_title='Panjang Teks (karakter)',
@@ -906,7 +902,7 @@ elif page == "🔍 Analisis Token":
             marker_color=colors_bar,
             hovertext=text_labels, hoverinfo='text',
         ))
-        # ── PERBAIKAN Masalah 1 ──────────────────────────────────────────────
+
         fig_grid.update_layout(**get_plotly_layout(extra=dict(
             title='Top-3 Token Word2Vec per Kondisi Mental',
             xaxis_title='Kondisi Mental',
@@ -969,7 +965,7 @@ elif page == "🔍 Analisis Token":
             text=df_eksklusif['Jumlah Token Eksklusif'],
             textposition='outside',
         ))
-        # ── PERBAIKAN Masalah 1 ──────────────────────────────────────────────
+
         fig2.update_layout(**get_plotly_layout(extra=dict(
             title='Jumlah Token Eksklusif per Kondisi Mental',
             xaxis_title='Kondisi',
@@ -1039,7 +1035,6 @@ elif page == "🤖 Performa Model":
                       annotation_position="top left",
                       annotation_font=dict(color="#EF4444", size=11, family="Syne"))
 
-        # Gunakan warna netral yang kontras di light & dark — hindari st.get_option yang tidak reliable
         _muted    = "#6B7280"
         _text_col = "#374151"
         _title_c  = "#0D9488"
@@ -1094,7 +1089,7 @@ elif page == "🤖 Performa Model":
                        annotation_text="Target F1 ≥ 0.75",
                        annotation_position="top right",
                        annotation_font=dict(color="#EF4444", size=11, family="Syne"))
-        # ── PERBAIKAN Masalah 1 ──────────────────────────────────────────────
+
         fig3.update_layout(**get_plotly_layout(extra=dict(
             title='F1-Score per Kondisi — Word2Vec + Random Forest',
             xaxis_title='F1 Score',
@@ -1119,7 +1114,7 @@ elif page == "🤖 Performa Model":
             title='Pola Kesalahan Klasifikasi (ukuran = frekuensi)',
             size_max=50,
         )
-        # ── PERBAIKAN Masalah 1 ──────────────────────────────────────────────
+
         fig4.update_layout(**get_plotly_layout(extra=dict(height=380)))
         st.plotly_chart(fig4, use_container_width=True, config=PLOTLY_CONFIG)
 
@@ -1201,7 +1196,7 @@ elif page == "🧪 A/B Testing":
             text=[f"{v:.4f}" for v in ab_results['Kondisi B (FastText)']],
             textposition='outside',
         ))
-        # ── PERBAIKAN Masalah 1 & 2: hapus legend=LIGHT_LEGEND, pakai get_plotly_layout ─
+
         fig_ab.update_layout(**get_plotly_layout(extra=dict(
             barmode='group',
             title='Perbandingan Metrik — Word2Vec vs FastText (Logistic Regression)',
@@ -1236,7 +1231,7 @@ elif page == "🧪 A/B Testing":
                     text=[f"{v:.2f}" for v in cr_A[metric]],
                     textposition='outside',
                 ))
-            # ── PERBAIKAN Masalah 1 & 2 ──────────────────────────────────────
+
             fig_cr_a.update_layout(**get_plotly_layout(extra=dict(
                 barmode='group', height=380, yaxis_range=[0,1.2], xaxis_tickangle=20,
             )))
@@ -1252,7 +1247,7 @@ elif page == "🧪 A/B Testing":
                     text=[f"{v:.2f}" for v in cr_B[metric]],
                     textposition='outside',
                 ))
-            # ── PERBAIKAN Masalah 1 & 2 ──────────────────────────────────────
+
             fig_cr_b.update_layout(**get_plotly_layout(extra=dict(
                 barmode='group', height=380, yaxis_range=[0,1.2], xaxis_tickangle=20,
             )))
@@ -1274,7 +1269,7 @@ elif page == "🧪 A/B Testing":
                               annotation_text="Target F1 ≥ 0.75",
                               annotation_position="top right",
                               annotation_font=dict(color="#EF4444", size=11, family="Syne"))
-        # ── PERBAIKAN Masalah 1 & 2 ──────────────────────────────────────────
+
         fig_f1_cmp.update_layout(**get_plotly_layout(extra=dict(
             barmode='group',
             title='F1-Score per Kelas — Word2Vec vs FastText',
@@ -1302,7 +1297,7 @@ elif page == "🧪 A/B Testing":
                 'B ❌ Salah': [mcnemar_data['n10'], mcnemar_data['n00']],
             })
             st.dataframe(ct, hide_index=True, use_container_width=True)
-            # ── PERBAIKAN Masalah 6: pakai CSS variables ──────────────────────
+
             st.markdown(f"""
             <div style="margin-top:0.8rem;">
             <div style="font-size:0.85rem; color:var(--text-secondary); line-height:2;">
@@ -1325,7 +1320,6 @@ elif page == "🧪 A/B Testing":
             verdict_text  = "Tidak Signifikan (p ≥ 0.05)" if not is_sig else "Signifikan (p < 0.05)"
             verdict_icon  = "✅" if not is_sig else "⚠️"
 
-            # ── PERBAIKAN Masalah 6: pakai CSS variables untuk teks ──────────
             st.markdown(f"""
             <div style="background:{bg_verdict}; border:1px solid {color_verdict}40;
                         border-left:4px solid {color_verdict}; border-radius:14px;
@@ -1359,13 +1353,11 @@ elif page == "🧪 A/B Testing":
         </div>
         """, unsafe_allow_html=True)
 
-        # P-value gauge — gunakan warna eksplisit yang selalu kontras di light & dark mode
-        # st.get_option("theme.base") tidak reliable (sering None), jadi tidak dipakai
-        _GAUGE_NUM   = "#0D9488"   # warna angka utama — teal kontras di background apapun
-        _GAUGE_TICK  = "#6B7280"   # warna tick labels — abu netral
-        _GAUGE_TITLE = "#0D9488"   # warna judul gauge
-        _step_lo     = "rgba(239,68,68,0.30)"   # merah semi-transparan (zona signifikan)
-        _step_hi     = "rgba(16,185,129,0.25)"  # hijau semi-transparan (zona aman)
+        _GAUGE_NUM   = "#0D9488"
+        _GAUGE_TICK  = "#6B7280"
+        _GAUGE_TITLE = "#0D9488"
+        _step_lo     = "rgba(239,68,68,0.30)"
+        _step_hi     = "rgba(16,185,129,0.25)"  
 
         fig_pval = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -1400,7 +1392,7 @@ elif page == "🧪 A/B Testing":
             height=320,
             margin=dict(t=60, b=30, l=40, r=40),
         )
-        # Override eksplisit — pastikan angka dan judul selalu teal (kontras di semua mode)
+
         fig_pval.update_traces(
             number_font_color=_GAUGE_NUM,
             title_font_color=_GAUGE_TITLE,
@@ -1473,7 +1465,7 @@ elif page == "📋 Kesimpulan":
         color  = "#10B981" if status else "#F59E0B"
         bg     = "rgba(16,185,129,0.08)" if status else "rgba(245,158,11,0.08)"
         border = "rgba(16,185,129,0.25)" if status else "rgba(245,158,11,0.25)"
-        # ── PERBAIKAN: pakai CSS variable untuk teks ──────────────────────────
+
         st.markdown(
             f'<div style="background:{bg}; border:1px solid {border}; border-left:3px solid {color}; '
             f'border-radius:10px; padding:0.7rem 1.2rem; margin:6px 0; color:var(--text-secondary); '
@@ -1482,7 +1474,6 @@ elif page == "📋 Kesimpulan":
         )
 
 # ─── Footer ───────────────────────────────────────────────────────────────────
-# ── PERBAIKAN Masalah 5: footer pakai CSS variables ───────────────────────────
 st.divider()
 st.markdown(
     "<div style='text-align:center; color:var(--muted); font-size:0.78rem; padding:0.6rem 0; letter-spacing:0.05em;'>"
