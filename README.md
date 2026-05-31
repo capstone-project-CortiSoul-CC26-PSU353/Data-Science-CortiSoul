@@ -5,6 +5,21 @@
 
 ---
 
+## 📓 Lihat Notebook
+
+Notebook utama berisi 131 cell dengan output visualisasi lengkap.
+Karena ukurannya besar, GitHub tidak dapat merendernya secara langsung.
+Gunakan salah satu link berikut:
+
+| Platform | Link | Keterangan |
+|---|---|---|
+| **nbviewer** | [![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/capstone-project-CortiSoul-CC26-PSU353/Data-Science-CortiSoul/blob/main/Notebook_CortiSoul_Data_Science.ipynb) | Render lengkap dengan output |
+| **Google Colab** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/capstone-project-CortiSoul-CC26-PSU353/Data-Science-CortiSoul/blob/main/Notebook_CortiSoul_Data_Science.ipynb) | Backup jika nbviewer tidak tersedia |
+
+> ⚠️ Jika nbviewer menampilkan error 503, gunakan link Google Colab sebagai alternatif.
+
+---
+
 ## 📌 Deskripsi Proyek
 
 **CortiSoul** adalah sistem berbasis *Natural Language Processing* (NLP) yang dirancang untuk menganalisis teks journaling berbahasa Indonesia guna mendeteksi kondisi emosional dan tingkat stres pengguna secara otomatis.
@@ -170,29 +185,6 @@ cortisoul/
 ├── 📁 dashboard/
 │   ├── cortisoul_dashboard.py            # Aplikasi Streamlit
 │   └── 📁 nb_images/                     # Gambar visualisasi dari notebook
-│       ├── eda_distribusi_kelas.png
-│       ├── eda_distribusi_panjang.png
-│       ├── eda_boxplot_panjang_per_kondisi.png
-│       ├── eda_top20_kata.png
-│       ├── wordcloud_kondisi_mental.png
-│       ├── explain_A1_heatmap_overlap_token_w2v.png
-│       ├── explain_A1_heatmap_overlap_token_ft.png
-│       ├── explain_A2_top10_w2v_grid.png
-│       ├── explain_A2_top10_ft_grid.png
-│       ├── explain_A3_token_eksklusif_w2v.png
-│       ├── explain_A3_token_eksklusif_ft.png
-│       ├── explain_B1_perbandingan_akurasi_f1.png
-│       ├── explain_B2_f1_per_kelas.png
-│       ├── explain_B3_confusion_matrix_analisis.png
-│       ├── confusion_matrix_semua_model.png
-│       ├── analisis_kesalahan.png
-│       ├── cluster_pca.png
-│       ├── waktu_training_w2v_ft.png
-│       ├── ab_testing_w2v_vs_ft.png
-│       ├── ab_global_comparison.png
-│       ├── cm_word2vec.png
-│       ├── f1_per_kelas.png
-│       └── cm_fasttext.png
 │
 ├── 📁 data/
 │   └── data_setelah_Preprocessing.csv    # Dataset hasil preprocessing
