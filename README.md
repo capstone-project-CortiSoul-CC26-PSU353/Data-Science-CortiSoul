@@ -44,7 +44,6 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 | **Bahasa** | Indonesia (hasil terjemahan) |
 | **Total data awal** | 103.488 entri |
 | **Total data digunakan** | 9.163 entri |
-| **Data setelah filter (≥3 kata)** | 8.707 entri |
 | **Kolom** | `text` (teks journaling), `status` (label kondisi) |
 | **Jumlah kelas** | 7 kondisi mental |
 
@@ -53,12 +52,12 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 | Kondisi Mental | Jumlah Data |
 |---|---|
 | Suicidal | 1.657 |
-| Anxiety | 1.504 |
-| Depression | 1.487 |
-| Normal | 1.381 |
-| Bipolar | 1.333 |
-| Stress | 1.046 |
-| Personality Disorder | 730 |
+| Anxiety | 1.198 |
+| Depression | 1.635 |
+| Normal | 1.237 |
+| Bipolar | 966 |
+| Stress | 1.236 |
+| Personality Disorder | 1234 |
 
 ---
 
@@ -95,23 +94,23 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 | FastText | LinearSVC | 82.3% | 0.8454 |
 | FastText | Random Forest | 82.0% | 0.8459 |
 
-### 🏆 Model Terbaik: Word2Vec + Random Forest
+### 🏆 Model Terbaik: Word2Vec + LinearSVC
 
-- **Akurasi:** 83.5% ± 0.7% ✅ (target ≥ 80%)
-- **F1 Macro:** 0.8598 ✅ (target ≥ 0.75)
+- **Akurasi:** 82.9% ± 0.7% ✅ (target ≥ 80%)
+- **F1 Macro:** 0.8511 ✅ (target ≥ 0.75)
 - Word2Vec unggul karena representasi konteks kata berbasis token lebih stabil untuk teks journaling Bahasa Indonesia
 
-### F1-Score per Kelas (Model Terbaik: Word2Vec + Random Forest)
+### F1-Score per Kelas (Model Terbaik: Word2Vec + LinearSVC)
 
 | Kondisi | F1-Score | Keterangan |
 |---|---|---|
-| Bipolar | 0.93 | ✅ Terbaik |
-| Anxiety | 0.91 | ✅ |
-| Stress | 0.89 | ✅ |
-| Personality Disorder | 0.88 | ✅ |
-| Normal | 0.85 | ✅ |
-| Depression | 0.72 | ⚠️ Di bawah target |
-| Suicidal | 0.71 | ⚠️ Di bawah target |
+| Bipolar | 0.98 | ✅ Terbaik |
+| Anxiety | 0.95 | ✅ |
+| Stress | 0.97 | ✅ |
+| Personality Disorder | 0.97 | ✅ |
+| Normal | 0.76 | ✅ |
+| Depression | 0.63 | ⚠️ Di bawah target |
+| Suicidal | 0.66 | ⚠️ Di bawah target |
 
 ---
 
@@ -121,15 +120,12 @@ Pengujian murni pengaruh metode embedding dengan model yang identik (Logistic Re
 
 | Metrik | Word2Vec (A) | FastText (B) | Selisih |
 |---|---|---|---|
-| Accuracy | 0.8200 | 0.8230 | +0.0030 |
-| Precision | 0.8214 | 0.8243 | +0.0029 |
-| Recall | 0.8200 | 0.8230 | +0.0030 |
-| F1-Score | 0.8197 | 0.8228 | +0.0031 |
+| Accuracy | 0.7995 | 0.7725 | -0.0270 |
+| Precision | 0.8002 | 0.7730 | -0.0272 |
+| Recall | 0.7995 | 0.7725 | -0.0270 |
+| F1-Score | 0.7998 | 0.7725 | -0.0273 |
 
-**Uji Statistik McNemar:** Statistik = 2.0944, p-value = **0.1478** → perbedaan **tidak signifikan secara statistik** (p ≥ 0.05).
-
-> ⚠️ Catatan: Pada A/B Testing ini (Logistic Regression), FastText sedikit lebih unggul. Namun pada eksperimen dengan Random Forest (5-Fold CV), Word2Vec justru lebih baik. Pilihan embedding optimal bergantung pada model klasifikasi yang digunakan. **Word2Vec + Random Forest tetap menjadi rekomendasi utama.**
-
+**Uji Statistik McNemar:** Statistik = 72.1287, p-value = **0.0000** → perbedaan **signifikan secara statistik** (p ≥ 0.05).
 ---
 
 ## 🔍 Analisis Token Eksklusif
@@ -161,7 +157,7 @@ Token eksklusif diidentifikasi via Word2Vec `most_similar()` — kata yang hanya
 
 **Pertanyaan 2 — Performa Model:**
 - Semua 4 kombinasi model berhasil melampaui target akurasi ≥ 80%
-- Model terbaik **Word2Vec + Random Forest** mencapai akurasi **83.5%** dan F1 Macro **0.8598**
+- Model terbaik **Word2Vec + LinearSVC** mencapai akurasi **82.9%** dan F1 Macro **0.8511**
 - Depression dan Suicidal masih memiliki F1 < 0.75 dan sering tertukar satu sama lain (100 kasus suicidal → depression, 88 kasus depression → suicidal)
 
 ---

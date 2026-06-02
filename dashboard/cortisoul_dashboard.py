@@ -400,8 +400,8 @@ st.markdown("""
 
 # ─── Data yang sudah diekstrak dari notebook ────────────────────────────────
 _LABEL_FALLBACK = {
-    'suicidal': 1657, 'anxiety': 1504, 'depression': 1487,
-    'normal': 1381, 'bipolar': 1333, 'stress': 1046, 'personality disorder': 730,
+    'suicidal': 1657, 'depression': 1635, 'normal': 1236,
+    'personality disorder': 1234, 'stress': 1233, 'anxiety': 1190, 'bipolar': 966,
 }
 
 def _get_label_dist(df):
@@ -420,14 +420,14 @@ label_dist = _get_label_dist(df_raw)
 
 model_performance = pd.DataFrame({
     'Representasi Vektor': ['Word2Vec', 'Word2Vec', 'FastText', 'FastText'],
-    'Model Klasifikasi':   ['Random Forest', 'LinearSVC', 'LinearSVC', 'Random Forest'],
-    'Akurasi': [0.8350, 0.8200, 0.8230, 0.8200],
-    'F1 Macro': [0.8598, 0.8526, 0.8454, 0.8459],
+    'Model Klasifikasi':   ['Random Forest', 'LinearSVC', 'Random Forest', 'LinearSVC'],
+    'Akurasi': [0.826, 0.829, 0.813, 0.821],
+    'F1 Macro': [0.851, 0.851, 0.838, 0.844],
 })
 
 f1_per_kelas = {
-    'anxiety': 0.91, 'bipolar': 0.93, 'depression': 0.72,
-    'normal': 0.85, 'personality disorder': 0.88, 'stress': 0.89, 'suicidal': 0.71,
+    'anxiety': 0.955, 'bipolar': 0.985, 'depression': 0.636,
+    'normal': 0.765, 'personality disorder': 0.979, 'stress': 0.977, 'suicidal': 0.661,
 }
 
 token_eksklusif = {
@@ -461,15 +461,19 @@ top3_ft = {
 }
 
 confusion_pairs = pd.DataFrame({
-    'Aktual':    ['suicidal', 'depression', 'normal', 'suicidal', 'normal'],
-    'Prediksi':  ['depression', 'suicidal', 'suicidal', 'normal', 'depression'],
-    'Jumlah':    [100, 88, 16, 14, 9],
-    'Recall %':  [30.5, 27.0, 9.4, 4.3, 5.3],
+    'Aktual':    ['depression', 'suicidal', 'depression', 'suicidal', 'normal', 'normal', 'anxiety', 'normal', 'normal', 'normal'],
+    'Prediksi':  ['suicidal', 'depression', 'normal', 'normal', 'depression', 'suicidal', 'normal', 'anxiety', 'personality disorder', 'stress'],
+    'Jumlah':    [466, 415, 137, 128, 99, 96, 30, 21, 21, 20],
+    'Recall %':  [28.5, 25.1, 8.4, 7.7, 8.0, 7.8, 2.5, 1.7, 1.7, 1.6],
 })
 
 def _get_stats(df):
     base = {
-        'total_data': 9163, 'data_bersih': 9152, 'data_setelah_filter': 9152,
+        'total_data_asli': 103488,   # dataset original sebelum translasi
+        'total_data_awal': 9163,     # data mentah setelah translasi ke Bahasa Indonesia
+        'total_data': 9151,          # data setelah preprocessing (clean_processed.csv)
+        'data_bersih': 9151, 'data_setelah_filter': 9151,
+        'jumlah_kolom': 10, 'missing_values': 8, 'duplikat_teks': 68,
         'fitur_unik': 5000, 'min_panjang': 4, 'max_panjang': 5902,
         'median_panjang': 217, 'mean_panjang': 465,
     }
@@ -532,10 +536,10 @@ st.markdown(f"""
 <div class="topbar">
     <div class="topbar-brand">🧠 CortiSoul <span>NLP · Kesehatan Mental · Bahasa Indonesia</span></div>
     <div class="topbar-info">
-        <div class="topbar-stat">📦 <b>{stats['total_data']:,}</b> Data</div>
+        <div class="topbar-stat">📦 <b>{stats['total_data_awal']:,}</b> Data (Terjemahan)</div>
         <div class="topbar-stat">🏷️ <b>7 Kelas</b></div>
-        <div class="topbar-stat">🏆 <b>Word2Vec + Random Forest</b></div>
-        <div class="topbar-stat">🎯 Akurasi <b>83.5%</b> &nbsp;|&nbsp; F1 <b>0.8598</b></div>
+        <div class="topbar-stat">🏆 <b>Word2Vec + LinearSVC</b></div>
+        <div class="topbar-stat">🎯 Akurasi <b>82.9%</b> &nbsp;|&nbsp; F1 <b>0.851</b></div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -565,10 +569,10 @@ if page == "🏠 Overview":
     st.markdown('<div class="subtitle">Analisis NLP Teks Journaling untuk Deteksi Kondisi Kesehatan Mental Berbahasa Indonesia</div>', unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
-    with col1: st.metric("Data Mentah (Awal)", f"{stats['total_data']:,}", "sebelum cleaning")
+    with col1: st.metric("Data Awal (Terjemahan)", f"{stats['total_data_awal']:,}", "dari 103.488 data asli")
     with col2: st.metric("Kondisi Mental", "7 Kelas", "multi-label")
-    with col3: st.metric("Akurasi Terbaik", "83.5%", "✅ Tercapai")
-    with col4: st.metric("F1-Score Macro", "0.8598", "✅ ≥ 0.75")
+    with col3: st.metric("Akurasi Terbaik", "82.9%", "✅ Tercapai")
+    with col4: st.metric("F1-Score Macro", "0.851", "✅ ≥ 0.75")
 
     if df_raw is not None:
         r, c = df_raw.shape
@@ -587,10 +591,15 @@ if page == "🏠 Overview":
                 </div>
             </div>
             """, unsafe_allow_html=True)
-        with ci2: st.metric("Data Setelah Cleaning", f"{r:,}")
+        with ci2: st.metric("Data Setelah Preprocessing", f"{r:,}")
         with ci3: st.metric("Jumlah Kolom", c)
         with ci4: st.metric("Missing Values", int(df_raw.isnull().sum().sum()))
     else:
+        ci1, ci2, ci3, ci4 = st.columns(4)
+        with ci1: st.metric("Data Awal (Terjemahan)", f"{stats['total_data_awal']:,}", "dari 103.488 data asli")
+        with ci2: st.metric("Data Setelah Preprocessing", f"{stats['total_data']:,}")
+        with ci3: st.metric("Jumlah Kolom", "10", "text, status, + 8 lainnya")
+        with ci4: st.metric("Missing Values", "8", "clean_text / lower / normalized")
         st.warning("⚠️ File data tidak ditemukan di folder `../data/`. Letakkan `data_setelah_Preprocessing.csv` di sana.")
 
     st.markdown('<div class="section-header">Gambaran Proyek</div>', unsafe_allow_html=True)
@@ -605,14 +614,15 @@ if page == "🏠 Overview":
         </div>
 
         <div class="insight-box">
-        <b>📦 Dataset:</b> Mental Health Condition Classification Dataset yang diterjemahkan ke Bahasa Indonesia,
-        berisi 9.163 entri teks dengan 7 label kondisi mental: Anxiety, Normal, Depression, Stress,
+        <b>📦 Dataset:</b> Mental Health Condition Classification Dataset (103.488 data asli) yang diterjemahkan ke Bahasa Indonesia
+        menghasilkan <b>9.163 entri</b>. Setelah proses cleaning dan preprocessing menggunakan Sastrawi, tersisa
+        <b>9.151 entri</b> dengan 10 kolom dan 7 label kondisi mental: Anxiety, Normal, Depression, Stress,
         Personality Disorder, Bipolar, dan Suicidal.
         </div>
 
         <div class="insight-box">
         <b>⚙️ Pipeline NLP:</b> Preprocessing (Sastrawi stemmer) → Tokenisasi → Word Embedding
-        (Word2Vec/FastText, vector_size=100, window=5) → Klasifikasi (Random Forest & LinearSVC)
+        (Word2Vec/FastText, vector_size=100, window=5) → Klasifikasi (LinearSVC & Random Forest)
         </div>
         """, unsafe_allow_html=True)
 
@@ -640,8 +650,8 @@ if page == "🏠 Overview":
         st.plotly_chart(fig, use_container_width=True, config=PLOTLY_CONFIG)
 
     st.markdown('<div class="section-header">Alur Metodologi</div>', unsafe_allow_html=True)
-    steps  = ["📥 Gathering Data", "🔍 Assessing Data", "🧹 Cleaning Data", "⚙️ Preprocessing", "📊 EDA & Analisis Token", "🤖 Modeling", "📈 Evaluasi"]
-    colors = ["#0D9488", "#10B981", "#06B6D4", "#0891B2", "#059669", "#F59E0B", "#EF4444"]
+    steps  = ["📥 Gathering Data", "🔍 Assessing Data", "🧹 Cleaning Data", "⚙️ Preprocessing", "📊 EDA & Analisis Token", "🤖 Modeling", "📈 Evaluasi", "🧪 A/B Testing"]
+    colors = ["#0D9488", "#10B981", "#06B6D4", "#0891B2", "#059669", "#F59E0B", "#EF4444", "#FFA5D6"]
     steps_html = "".join([
         f'<div style="text-align:center;background:{c}22;border-radius:10px;padding:10px 8px;'
         f'border:1px solid {c}44;font-size:clamp(0.68rem,1.4vw,0.78rem);font-weight:600;color:{c};'
@@ -662,6 +672,11 @@ elif page == "📂 Dataset":
 
     if df_raw is None:
         st.error("❌ File tidak ditemukan di folder `../data/`. Pastikan `data_setelah_Preprocessing.csv` ada di sana.")
+        d1, d2, d3, d4 = st.columns(4)
+        with d1: st.metric("Total Entri (Awal)", "9,163", "sebelum cleaning")
+        with d2: st.metric("Total Kolom", "10")
+        with d3: st.metric("Jumlah Kelas", "7")
+        with d4: st.metric("Missing Values", "8", "clean_text/lower/normalized")
     else:
         r, c = df_raw.shape
         d1, d2, d3, d4 = st.columns(4)
@@ -787,8 +802,8 @@ elif page == "📊 Distribusi Data":
     st.markdown('<div class="section-header">Statistik Panjang Teks</div>', unsafe_allow_html=True)
 
     col1, col2, col3, col4, col5 = st.columns(5)
-    with col1: st.metric("Data Awal", f"{stats['total_data']:,}", "sebelum cleaning")
-    with col2: st.metric("Setelah Hapus Duplikat", f"{stats['data_bersih']:,}", "11 duplikat dihapus")
+    with col1: st.metric("Data Awal (Terjemahan)", f"{stats['total_data_awal']:,}", "sebelum cleaning")
+    with col2: st.metric("Setelah Preprocessing", f"{stats['total_data']:,}", "12 duplikat dihapus")
     with col3: st.metric("Panjang Min", f"{stats['min_panjang']} karakter")
     with col4: st.metric("Median Panjang", f"{stats['median_panjang']} karakter")
     with col5: st.metric("Rata-rata Panjang", f"{stats['mean_panjang']} karakter")
@@ -842,15 +857,15 @@ elif page == "📊 Distribusi Data":
     _min_p     = stats['min_panjang'];   _max_p    = stats['max_panjang']
 
     st.markdown(f"""
-    <div class="insight-box">✅ <b>Tidak ada missing values</b> pada kolom teks dan label, dataset bersih secara struktural.</div>
-    <div class="warning-box">⚠️ <b>Class Imbalance:</b> Kelas <i>{_kelas_max}</i> ({_n_max:,} data) memiliki {_rasio:.1f}× lebih banyak data dibanding <i>{_kelas_min}</i> ({_n_min:,} data).</div>
-    <div class="warning-box">⚠️ <b>11 data duplikat</b> ditemukan dari total 9.163 data — dihapus pada tahap cleaning, tersisa 9.152 data unik.</div>
+    <div class="warning-box">⚠️ <b>8 missing values</b> ditemukan pada kolom <i>clean_text</i>, <i>lower</i>, dan <i>normalized</i> — perlu ditangani sebelum pemodelan.</div>
+    <div class="warning-box">⚠️ <b>12 data duplikat</b> ditemukan dari total 9.163 data (sebelum cleaning) — dihapus pada tahap cleaning, tersisa 9.151 data. Selain itu terdapat <b>68 duplikat teks</b> pada kolom tokens.</div>
     <div class="insight-box">📏 <b>Variasi panjang teks tinggi:</b> Min {_min_p} karakter hingga {_max_p:,} karakter. Median ({_med}) jauh di bawah mean ({_mean_val}), menunjukkan distribusi right-skewed.</div>
+    <div class="insight-box">📊 <b>Distribusi kelas:</b> Suicidal ({label_dist.get('suicidal',0):,}, 18.1%) paling banyak, Bipolar ({label_dist.get('bipolar',0):,}, 10.6%) paling sedikit. Rasio imbalance ringan → tidak perlu SMOTE.</div>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="section-header">Visualisasi dari Notebook</div>', unsafe_allow_html=True)
     dist_tabs = st.tabs(["📊 Distribusi Kelas", "📏 Panjang Teks", "📦 Boxplot per Kondisi", "🔠 Top-20 Kata"])
-    with dist_tabs[0]: show_nb_image("eda_distribusi_kelas.png")
+    with dist_tabs[0]: show_nb_image("distribusi_kondisi_mental.png")
     with dist_tabs[1]: show_nb_image("eda_distribusi_panjang.png", "Distribusi panjang teks")
     with dist_tabs[2]: show_nb_image("eda_boxplot_panjang_per_kondisi.png", "Boxplot panjang teks per kondisi mental")
     with dist_tabs[3]: show_nb_image("eda_top20_kata.png", "Top-20 kata paling sering muncul di dataset")
@@ -978,7 +993,7 @@ elif page == "🔍 Analisis Token":
 
         st.markdown("""
         <div class="success-box">✅ <b>Anxiety</b> adalah kondisi yang paling mudah dibedakan (10 token eksklusif).</div>
-        <div class="warning-box">⚠️ <b>Depression</b> dan <b>Suicidal</b> adalah kondisi yang paling sulit dibedakan — hanya 6 token eksklusif, sehingga pola bahasanya sangat mirip dan sering tumpang tindih satu sama lain.</div>
+        <div class="warning-box">⚠️ <b>Depression</b> (F1 0.636) dan <b>Suicidal</b> (F1 0.661) adalah kondisi yang paling sulit dibedakan — hanya 6 token eksklusif, sehingga pola bahasanya sangat mirip dan sering tumpang tindih satu sama lain.</div>
         """, unsafe_allow_html=True)
 
     st.markdown('<div class="section-header">Visualisasi dari Notebook</div>', unsafe_allow_html=True)
@@ -1065,11 +1080,11 @@ elif page == "🤖 Performa Model":
 
         st.markdown("""
         <div class="success-box">✅ <b>Semua model</b> mencapai akurasi di atas 80% dan F1 Macro ≥ 0.75 — kedua target penelitian terpenuhi.</div>
-        <div class="insight-box">🏆 <b>Model terbaik:</b> Word2Vec + Random Forest dengan akurasi <b>83.5%</b> dan F1 Macro <b>0.8598</b>.</div>
+        <div class="insight-box">🏆 <b>Model terbaik:</b> Word2Vec + LinearSVC dengan akurasi <b>82.9%</b> dan F1 Macro <b>0.851</b>. Word2Vec + Random Forest memiliki F1 yang sama (0.851) namun akurasi sedikit lebih rendah (82.6%).</div>
         """, unsafe_allow_html=True)
 
     with tab2:
-        st.markdown("#### F1-Score per Kondisi Mental (Model Terbaik: Word2Vec + Random Forest)")
+        st.markdown("#### F1-Score per Kondisi Mental (Model Terbaik: Word2Vec + LinearSVC)")
 
         df_f1 = pd.DataFrame({
             'Kondisi':  list(f1_per_kelas.keys()),
@@ -1091,7 +1106,7 @@ elif page == "🤖 Performa Model":
                        annotation_font=dict(color="#EF4444", size=11, family="Syne"))
 
         fig3.update_layout(**get_plotly_layout(extra=dict(
-            title='F1-Score per Kondisi — Word2Vec + Random Forest',
+            title='F1-Score per Kondisi — Word2Vec + LinearSVC',
             xaxis_title='F1 Score',
             xaxis_range=[0, 1.1],
             height=380,
@@ -1099,8 +1114,8 @@ elif page == "🤖 Performa Model":
         st.plotly_chart(fig3, use_container_width=True, config=PLOTLY_CONFIG)
 
         st.markdown("""
-        <div class="success-box">✅ <b>Bipolar</b> memiliki F1-score tertinggi (0.93) — paling mudah diklasifikasikan.</div>
-        <div class="warning-box">⚠️ <b>Depression</b> dan <b>Suicidal</b> memiliki F1 &lt; 0.75. Kedua kondisi ini perlu penanganan tambahan seperti <b>SMOTE</b> atau augmentasi data.</div>
+        <div class="success-box">✅ <b>Bipolar</b> memiliki F1-score tertinggi (0.985) — paling mudah diklasifikasikan. Diikuti Personality Disorder (0.979) dan Stress (0.977).</div>
+        <div class="warning-box">⚠️ <b>Depression</b> (F1 0.636) dan <b>Suicidal</b> (F1 0.661) berada di bawah target 0.75 — kedua kondisi ini paling sering tertukar dan perlu penanganan tambahan seperti <b>SMOTE</b> atau augmentasi data.</div>
         """, unsafe_allow_html=True)
 
     with tab3:
@@ -1119,14 +1134,18 @@ elif page == "🤖 Performa Model":
         st.plotly_chart(fig4, use_container_width=True, config=PLOTLY_CONFIG)
 
         st.markdown("""
-        <div class="warning-box">⚠️ <b>Suicidal ↔ Depression</b> adalah pasangan yang paling sering tertukar: 100 kasus suicidal diprediksi sebagai depression (30.5% dari kelas suicidal), dan 88 kasus depression diprediksi sebagai suicidal (27% dari kelas depression).</div>
+        <div class="warning-box">⚠️ <b>Depression ↔ Suicidal</b> adalah pasangan paling sering tertukar:<br>
+        &nbsp;&nbsp;• 466 kasus <i>depression</i> diprediksi sebagai <i>suicidal</i> (<b>28.5%</b> dari kelas depression)<br>
+        &nbsp;&nbsp;• 415 kasus <i>suicidal</i> diprediksi sebagai <i>depression</i> (<b>25.1%</b> dari kelas suicidal)<br>
+        Secara total, lebih dari <b>880 prediksi</b> tertukar di antara dua kelas ini.</div>
+        <div class="insight-box">📊 <b>Normal</b> juga sering tertukar dengan depression (99 kasus, 8.0%) dan suicidal (96 kasus, 7.8%) — menunjukkan overlap semantik yang signifikan antara ketiga kelas ini.</div>
         """, unsafe_allow_html=True)
 
     st.markdown('<div class="section-header">Visualisasi dari Notebook</div>', unsafe_allow_html=True)
     img_tabs = st.tabs(["🧩 Confusion Matrix","📉 Akurasi & F1","🎯 F1 per Kelas","⚠️ Analisis Kesalahan","🗺️ PCA Cluster","⏱️ Waktu Training"])
     with img_tabs[0]: show_nb_image("confusion_matrix_semua_model.png", "Confusion matrix semua model (2×2 grid)")
     with img_tabs[1]: show_nb_image("explain_B1_perbandingan_akurasi_f1.png", "Perbandingan akurasi & F1 semua model")
-    with img_tabs[2]: show_nb_image("f1_per_kelas.png", "F1-score per kelas dari A/B Testing — Word2Vec vs FastText")
+    with img_tabs[2]: show_nb_image("explain_B2_f1_per_kelas.png", "F1-score per kelas — Word2Vec + LinearSVC (model terbaik)")
     with img_tabs[3]: show_nb_image("analisis_kesalahan.png", "Analisis kesalahan klasifikasi antar kondisi")
     with img_tabs[4]: show_nb_image("cluster_pca.png", "Visualisasi PCA cluster — representasi vektor Word2Vec vs FastText")
     with img_tabs[5]: show_nb_image("waktu_training_w2v_ft.png", "Waktu training Word2Vec vs FastText")
@@ -1141,35 +1160,38 @@ elif page == "🧪 A/B Testing":
     <b>🎯 Tujuan A/B Testing:</b> Membandingkan dua metode word embedding dengan model yang <b>sama persis</b>
     (Logistic Regression, parameter identik, seed dikunci) agar perbedaan hasil murni berasal dari
     metode representasi teks, bukan dari model.<br><br>
-    <b>Kondisi A:</b> Word2Vec + Logistic Regression &nbsp;|&nbsp; <b>Kondisi B:</b> FastText + Logistic Regression
+    <b>Kondisi A:</b> Word2Vec + Logistic Regression &nbsp;|&nbsp; <b>Kondisi B:</b> FastText + Logistic Regression<br><br>
+    ✅ <i>Hasil: <b>Word2Vec (Kondisi A) unggul di semua metrik</b> dan perbedaannya
+    <b>signifikan secara statistik</b> (p = 0.0000). Ini konsisten dengan hasil eksperimen utama
+    (<b>Word2Vec + LinearSVC</b> sebagai model terbaik).</i>
     </div>
     """, unsafe_allow_html=True)
 
     ab_results = pd.DataFrame({
         'Metrik':               ['Accuracy', 'Precision', 'Recall', 'F1-Score'],
-        'Kondisi A (Word2Vec)': [0.8200, 0.8214, 0.8200, 0.8197],
-        'Kondisi B (FastText)': [0.8230, 0.8243, 0.8230, 0.8228],
-        'Selisih (B - A)':      [0.0030, 0.0029, 0.0030, 0.0031],
+        'Kondisi A (Word2Vec)': [0.7995, 0.8002, 0.7995, 0.7998],
+        'Kondisi B (FastText)': [0.7725, 0.7730, 0.7725, 0.7725],
+        'Selisih (B - A)':      [-0.0270, -0.0272, -0.0270, -0.0273],
     })
 
     cr_A = pd.DataFrame({
         'Kondisi':   ['anxiety','bipolar','depression','normal','personality disorder','stress','suicidal'],
-        'Precision': [0.95,0.97,0.66,0.83,0.97,0.97,0.65],
-        'Recall':    [0.91,0.98,0.63,0.93,0.97,0.96,0.64],
-        'F1':        [0.93,0.97,0.64,0.88,0.97,0.96,0.64],
+        'Precision': [0.93,0.98,0.60,0.70,0.96,0.96,0.63],
+        'Recall':    [0.93,0.97,0.61,0.70,0.97,0.97,0.63],
+        'F1':        [0.9320,0.9754,0.6030,0.6965,0.9624,0.9646,0.6295],
         'Support':   [238,193,327,247,247,247,331],
     })
     cr_B = pd.DataFrame({
         'Kondisi':   ['anxiety','bipolar','depression','normal','personality disorder','stress','suicidal'],
-        'Precision': [0.96,0.97,0.67,0.84,0.97,0.97,0.66],
-        'Recall':    [0.92,0.98,0.64,0.94,0.97,0.96,0.65],
-        'F1':        [0.94,0.97,0.65,0.89,0.97,0.96,0.65],
+        'Precision': [0.91,0.97,0.55,0.64,0.96,0.95,0.60],
+        'Recall':    [0.91,0.97,0.55,0.65,0.96,0.95,0.59],
+        'F1':        [0.9133,0.9727,0.5496,0.6448,0.9591,0.9544,0.5949],
         'Support':   [238,193,327,247,247,247,331],
     })
 
     mcnemar_data = {
-        'n11': 1498, 'n10': 55, 'n01': 72, 'n00': 205,
-        'statistic': 2.0944, 'pvalue': 0.1478,
+        'n11': 1354, 'n10': 282, 'n01': 11, 'n00': 184,
+        'statistic': 72.1287, 'pvalue': 0.0000,
     }
 
     tab1, tab2, tab3 = st.tabs(["📊 Perbandingan Metrik", "📋 Laporan per Kelas", "🔬 Uji Statistik McNemar"])
@@ -1178,10 +1200,10 @@ elif page == "🧪 A/B Testing":
         st.markdown("#### Hasil Perbandingan Keseluruhan")
 
         m1, m2, m3, m4 = st.columns(4)
-        with m1: st.metric("Akurasi — Word2Vec", "82.00%", "-0.30% vs FastText")
-        with m2: st.metric("Akurasi — FastText", "82.30%")
-        with m3: st.metric("F1-Score — Word2Vec", "0.8197", "-0.0031 vs FastText")
-        with m4: st.metric("F1-Score — FastText", "0.8228")
+        with m1: st.metric("Akurasi — Word2Vec", "79.95%", "+2.70% vs FastText")
+        with m2: st.metric("Akurasi — FastText", "77.25%")
+        with m3: st.metric("F1-Score — Word2Vec", "0.7998", "+0.0273 vs FastText")
+        with m4: st.metric("F1-Score — FastText", "0.7725")
 
         fig_ab = go.Figure()
         fig_ab.add_trace(go.Bar(
@@ -1212,8 +1234,8 @@ elif page == "🧪 A/B Testing":
         st.dataframe(df_show_ab, hide_index=True, use_container_width=True)
 
         st.markdown("""
-        <div class="success-box">✅ <b>FastText (Kondisi B) sedikit lebih unggul</b> dari Word2Vec pada A/B Testing ini (keduanya pakai Logistic Regression). Peningkatan F1-Score FastText: <b>+0.31%</b> — namun perbedaan ini <b>tidak signifikan secara statistik</b> (p = 0.1478 &gt; 0.05).</div>
-        <div class="insight-box">💡 <b>Catatan penting:</b> Pada eksperimen Stratified 5-Fold CV dengan Random Forest, Word2Vec justru lebih unggul (83.5% vs 82.0%). <b>Word2Vec + Random Forest</b> tetap menjadi kombinasi terbaik secara keseluruhan.</div>
+        <div class="success-box">✅ <b>Word2Vec (Kondisi A) lebih unggul</b> dari FastText di semua metrik. Selisih F1-Score: <b>+3.53%</b> — dan perbedaan ini <b>signifikan secara statistik</b> (p = 0.0000 &lt; 0.05).</div>
+        <div class="insight-box">💡 <b>Catatan penting:</b> Pada eksperimen Stratified 5-Fold CV dengan LinearSVC, Word2Vec juga lebih unggul (82.9% vs 82.1%). <b>Word2Vec + LinearSVC</b> tetap menjadi kombinasi terbaik secara keseluruhan.</div>
         """, unsafe_allow_html=True)
 
     with tab2:
@@ -1279,8 +1301,8 @@ elif page == "🧪 A/B Testing":
         st.plotly_chart(fig_f1_cmp, use_container_width=True, config=PLOTLY_CONFIG)
 
         st.markdown("""
-        <div class="warning-box">⚠️ <b>Depression</b> dan <b>Suicidal</b> tetap menjadi kelas terlemah di kedua kondisi.</div>
-        <div class="success-box">✅ <b>Anxiety, Bipolar, Personality Disorder, dan Stress</b> mencapai F1 ≥ 0.96 di kedua kondisi.</div>
+        <div class="success-box">✅ <b>Word2Vec unggul di semua 7 kelas</b> — tidak ada satu pun kelas yang FastText lebih baik.</div>
+        <div class="warning-box">⚠️ <b>Depression</b> dan <b>Suicidal</b> tetap menjadi kelas terlemah di kedua kondisi (F1 Word2Vec: 0.603 & 0.630; FastText bahkan lebih rendah: 0.550 & 0.595).</div>
         """, unsafe_allow_html=True)
 
     with tab3:
@@ -1346,10 +1368,10 @@ elif page == "🧪 A/B Testing":
 
         st.markdown("""
         <div class="insight-box" style="margin-top:1rem;">
-        <b>📊 Interpretasi:</b> Dengan p-value = <b>0.1478</b> (jauh di atas threshold 0.05), perbedaan performa antara Word2Vec dan FastText <b>tidak signifikan secara statistik</b>.
+        <b>📊 Interpretasi:</b> Dengan p-value = <b>0.0000</b> (jauh di bawah threshold 0.05), perbedaan performa antara Word2Vec dan FastText <b>signifikan secara statistik</b>. Word2Vec terbukti lebih unggul.
         </div>
         <div class="success-box">
-        🎯 <b>Rekomendasi Akhir:</b> Gunakan <b>Word2Vec + Random Forest</b> untuk platform CortiSoul karena secara keseluruhan menghasilkan akurasi dan F1 tertinggi (83.5%, F1 0.8598).
+        🎯 <b>Rekomendasi Akhir:</b> Gunakan <b>Word2Vec + LinearSVC</b> untuk platform CortiSoul karena secara keseluruhan menghasilkan akurasi dan F1 tertinggi (82.9%, F1 0.851).
         </div>
         """, unsafe_allow_html=True)
 
@@ -1398,7 +1420,7 @@ elif page == "🧪 A/B Testing":
             title_font_color=_GAUGE_TITLE,
         )
         st.plotly_chart(fig_pval, use_container_width=True, config=PLOTLY_CONFIG)
-        st.caption("Garis merah menunjukkan ambang batas signifikansi α = 0.05. P-value 0.1478 berada di zona hijau → tidak signifikan.")
+        st.caption("Garis merah menunjukkan ambang batas signifikansi α = 0.05. P-value 0.0000 berada jauh di zona merah → perbedaan signifikan secara statistik.")
         show_nb_image("ab_testing_w2v_vs_ft.png", "Bar chart perbandingan metrik A/B Testing Word2Vec vs FastText")
         show_nb_image("ab_global_comparison.png", "Perbandingan metrik global A/B Testing — Word2Vec vs FastText")
 
@@ -1420,6 +1442,7 @@ elif page == "📋 Kesimpulan":
 
         **Jawaban:**
         - Setiap kondisi mental memiliki token eksklusif yang menjadi ciri khasnya (diidentifikasi via Word2Vec `most_similar()`).
+        - Dataset: **9.163 data** (terjemahan dari 103.488 data asli), diproses menjadi **9.151 entri** setelah cleaning & preprocessing Sastrawi.
         - **Anxiety** paling mudah dibedakan (10 token eksklusif: benak, lumpuh, kuasa, gerogot, ragu, tawan, dll.).
         - **Stress** dicirikan kata *tenggat*, *rentet*, *wajib*; **Personality Disorder** oleh *monster*, *ilusi*, *fluktuasi*, *minder*.
         - **Depression** dan **Suicidal** memiliki hanya 6 token eksklusif masing-masing — paling sulit dibedakan karena tumpang tindih semantik tertinggi antar kondisi.
@@ -1430,9 +1453,9 @@ elif page == "📋 Kesimpulan":
         **Pertanyaan:** Bisakah model NLP mencapai akurasi ≥ 80% dan F1 ≥ 0,75 dalam mengklasifikasikan 7 kondisi mental?
 
         **Jawaban: YA ✅**
-        - Model terbaik: **Word2Vec + Random Forest** — Akurasi **83.5%**, F1 Macro **0.8598**
+        - Model terbaik: **Word2Vec + LinearSVC** — Akurasi **82.9%**, F1 Macro **0.851**
         - Semua 4 kombinasi model melewati target akurasi 80%.
-        - **Catatan:** Depression dan Suicidal masih di bawah F1 ≥ 0.75 — perlu penanganan tambahan.
+        - **Catatan:** Depression (F1 0.636) dan Suicidal (F1 0.661) di bawah target 0.75 — saling tertukar 881 kali. Normal (F1 0.765) juga sering tertukar dengan keduanya (195 kasus).
         """)
 
     st.markdown('<div class="section-header">Rekomendasi Pengembangan</div>', unsafe_allow_html=True)
@@ -1447,18 +1470,18 @@ elif page == "📋 Kesimpulan":
     with rec_col2:
         st.markdown("""
         <div class="insight-box"><b>4. Feature Engineering Lanjutan</b><br>Tambahkan fitur linguistik seperti analisis sentimen, deteksi emosi, intensitas negatif, dan fitur pragmatik.</div>
-        <div class="insight-box"><b>5. Tangani Tumpang Tindih Kelas</b><br>Kembangkan strategi khusus untuk membedakan pasangan kondisi yang sering tertukar: suicidal ↔ depression dan normal ↔ suicidal.</div>
+        <div class="insight-box"><b>5. Tangani Tumpang Tindih Kelas</b><br>Kembangkan strategi khusus untuk membedakan pasangan kondisi yang paling sering tertukar: <i>depression ↔ suicidal</i> (881 kasus total), dan <i>normal ↔ depression/suicidal</i> (195 kasus total).</div>
         <div class="insight-box"><b>6. Validasi Klinis</b><br>Sebelum deployment, validasi model dengan psikolog atau profesional kesehatan mental untuk memastikan keamanan dan akurasi klinis.</div>
         """, unsafe_allow_html=True)
 
     st.markdown('<div class="section-header">Ringkasan Pencapaian</div>', unsafe_allow_html=True)
     achievements = {
-        "Akurasi ≥ 80% tercapai":                   True,
-        "F1 Macro ≥ 0.75 tercapai":                  True,
-        "Word2Vec unggul pada model terbaik (RF)":   True,
-        "FastText unggul pada A/B Testing (LR)":     True,
-        "Semua kelas F1 ≥ 0.75":                     False,
-        "Depression & Suicidal perlu perbaikan":     True,
+        "Akurasi ≥ 80% tercapai":                              True,
+        "F1 Macro ≥ 0.75 tercapai":                            True,
+        "Word2Vec unggul pada model terbaik (LinearSVC)":      True,
+        "Word2Vec unggul pada A/B Testing (LR) — signifikan":  True,
+        "Semua kelas F1 ≥ 0.75":                               False,
+        "Depression & Suicidal perlu perbaikan":               True,
     }
     for achievement, status in achievements.items():
         icon   = "✅" if status else "⚠️"
