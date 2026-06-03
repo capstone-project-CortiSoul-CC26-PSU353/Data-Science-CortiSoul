@@ -42,22 +42,24 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 |---|---|
 | **Nama** | Mental Health Condition Classification Dataset |
 | **Bahasa** | Indonesia (hasil terjemahan) |
-| **Total data awal** | 103.488 entri |
-| **Total data digunakan** | 9.163 entri |
-| **Kolom** | `text` (teks journaling), `status` (label kondisi) |
+| **Total data asli** | 103.488 entri |
+| **Total data awal (terjemahan)** | 9.163 entri |
+| **Total data setelah preprocessing** | 9.151 entri |
+| **Kolom** | 10 kolom (`text`, `status`, `length`, `clean_text`, `lower`, `normalized`, `tokens`, `text_no_stopword`, `text_stemmed`, `text_preprocessed`) |
 | **Jumlah kelas** | 7 kondisi mental |
+| **Missing values** | 27 (tersebar di 6 kolom) |
 
 ### Distribusi Kelas
 
-| Kondisi Mental | Jumlah Data |
-|---|---|
-| Suicidal | 1.657 |
-| Anxiety | 1.198 |
-| Depression | 1.635 |
-| Normal | 1.237 |
-| Bipolar | 966 |
-| Stress | 1.236 |
-| Personality Disorder | 1234 |
+| Kondisi Mental | Jumlah Data | Persentase |
+|---|---|---|
+| Suicidal | 1.657 | 18.1% |
+| Depression | 1.635 | 17.9% |
+| Normal | 1.236 | 13.5% |
+| Personality Disorder | 1.234 | 13.5% |
+| Stress | 1.233 | 13.5% |
+| Anxiety | 1.190 | 13.0% |
+| Bipolar | 966 | 10.6% |
 
 ---
 
@@ -66,7 +68,7 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 ```
 📥 Gathering Data
        ↓
-🔍 Assessing Data     → Cek missing values, duplikat, distribusi kelas
+🔍 Assessing Data     → Cek missing values (27), duplikat (12), distribusi kelas
        ↓
 🧹 Cleaning Data      → Hapus duplikat, bersihkan URL/emoji/karakter khusus, normalisasi slang
        ↓
@@ -89,28 +91,28 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 
 | Representasi Vektor | Model Klasifikasi | Akurasi | F1 Macro |
 |---|---|---|---|
-| **Word2Vec** | **Random Forest** | **83.5% ± 0.7%** | **0.8598** |
-| Word2Vec | LinearSVC | 82.0% | 0.8526 |
-| FastText | LinearSVC | 82.3% | 0.8454 |
-| FastText | Random Forest | 82.0% | 0.8459 |
+| **Word2Vec** | **LinearSVC** | **82.9%** | **0.851** |
+| Word2Vec | Random Forest | 82.6% | 0.851 |
+| FastText | LinearSVC | 82.1% | 0.844 |
+| FastText | Random Forest | 81.3% | 0.838 |
 
 ### 🏆 Model Terbaik: Word2Vec + LinearSVC
 
 - **Akurasi:** 82.9% ± 0.7% ✅ (target ≥ 80%)
-- **F1 Macro:** 0.8511 ✅ (target ≥ 0.75)
+- **F1 Macro:** 0.851 ✅ (target ≥ 0.75)
 - Word2Vec unggul karena representasi konteks kata berbasis token lebih stabil untuk teks journaling Bahasa Indonesia
 
 ### F1-Score per Kelas (Model Terbaik: Word2Vec + LinearSVC)
 
 | Kondisi | F1-Score | Keterangan |
 |---|---|---|
-| Bipolar | 0.98 | ✅ Terbaik |
-| Anxiety | 0.95 | ✅ |
-| Stress | 0.97 | ✅ |
-| Personality Disorder | 0.97 | ✅ |
-| Normal | 0.76 | ✅ |
-| Depression | 0.63 | ⚠️ Di bawah target |
-| Suicidal | 0.66 | ⚠️ Di bawah target |
+| Bipolar | 0.985 | ✅ Terbaik |
+| Personality Disorder | 0.979 | ✅ |
+| Stress | 0.977 | ✅ |
+| Anxiety | 0.955 | ✅ |
+| Normal | 0.765 | ✅ Tepat di batas |
+| Suicidal | 0.661 | ⚠️ Di bawah target |
+| Depression | 0.636 | ⚠️ Di bawah target |
 
 ---
 
@@ -118,14 +120,15 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 
 Pengujian murni pengaruh metode embedding dengan model yang identik (Logistic Regression, parameter dan seed sama):
 
-| Metrik | Word2Vec (A) | FastText (B) | Selisih |
-|---|---|---|---|
-| Accuracy | 0.7995 | 0.7725 | -0.0270 |
-| Precision | 0.8002 | 0.7730 | -0.0272 |
-| Recall | 0.7995 | 0.7725 | -0.0270 |
-| F1-Score | 0.7998 | 0.7725 | -0.0273 |
+| Metrik | Word2Vec (A) | FastText (B) | Selisih (B - A) | Unggul |
+|---|---|---|---|---|
+| Accuracy | 0.7995 | 0.7725 | -0.0270 | Word2Vec |
+| Precision | 0.8002 | 0.7730 | -0.0272 | Word2Vec |
+| Recall | 0.7995 | 0.7725 | -0.0270 | Word2Vec |
+| F1-Score | 0.7998 | 0.7725 | -0.0273 | Word2Vec |
 
-**Uji Statistik McNemar:** Statistik = 72.1287, p-value = **0.0000** → perbedaan **signifikan secara statistik** (p ≥ 0.05).
+**Uji Statistik McNemar:** Statistik = 72.1287, p-value = **0.0000** → perbedaan **signifikan secara statistik** (p < 0.05). Word2Vec unggul di semua metrik dan semua kelas.
+
 ---
 
 ## 🔍 Analisis Token Eksklusif
@@ -139,10 +142,27 @@ Token eksklusif diidentifikasi via Word2Vec `most_similar()` — kata yang hanya
 | Normal | 10 | *meme, anime, santai, hobby, refreshing, seru* |
 | Personality Disorder | 10 | *monster, ilusi, fluktuasi, minder, identitas* |
 | Stress | 10 | *tenggat, rentet, wajib, deadline, burnout* |
-| Depression | 7 | *bertahuntahun, takdir, obsesi, sengsara* |
 | Suicidal | 8 | *pilih, alamiah, fantasi, kecut, acuh* |
+| Depression | 6 | *bertahuntahun, takdir, obsesi, sengsara* |
 
-**Anxiety** paling mudah dibedakan secara leksikal (10 token eksklusif). **Depression** dan **Suicidal** paling sulit — token eksklusif paling sedikit dan tumpang tindih semantik tinggi.
+**Anxiety** paling mudah dibedakan secara leksikal (10 token eksklusif). **Depression** (6) dan **Suicidal** (8) paling sulit — token eksklusif paling sedikit dan tumpang tindih semantik tertinggi.
+
+---
+
+## 🔎 Analisis Kesalahan Klasifikasi
+
+Pasangan kondisi yang paling sering tertukar (Word2Vec + LinearSVC, Stratified 5-Fold):
+
+| Aktual | Prediksi | Jumlah | Recall % |
+|---|---|---|---|
+| Depression | Suicidal | 466 | 28.5% |
+| Suicidal | Depression | 415 | 25.1% |
+| Depression | Normal | 137 | 8.4% |
+| Suicidal | Normal | 128 | 7.7% |
+| Normal | Depression | 99 | 8.0% |
+| Normal | Suicidal | 96 | 7.8% |
+
+Total kesalahan depression ↔ suicidal: **881 kasus**. Normal juga sering tumpang tindih dengan keduanya (195 kasus tambahan).
 
 ---
 
@@ -152,13 +172,13 @@ Token eksklusif diidentifikasi via Word2Vec `most_similar()` — kata yang hanya
 - Setiap kondisi memiliki token eksklusif yang menjadi ciri khasnya (diidentifikasi via Word2Vec `most_similar()`)
 - **Anxiety** paling mudah dibedakan (10 token eksklusif: *benak, lumpuh, kuasa, gerogot, ragu, tawan*, dll.)
 - **Stress** dicirikan kata *tenggat, rentet, wajib*; **Personality Disorder** oleh *monster, ilusi, fluktuasi, minder*
-- **Depression** dan **Suicidal** memiliki hanya 6–8 token eksklusif — paling sulit dibedakan karena tumpang tindih semantik tertinggi antar kondisi
+- **Depression** (6 token) dan **Suicidal** (8 token) paling sulit dibedakan karena tumpang tindih semantik tertinggi antar kondisi
 - Token umum (*pikir, orang, hidup*) muncul lintas kondisi dan tidak membedakan kelas secara spesifik
 
 **Pertanyaan 2 — Performa Model:**
-- Semua 4 kombinasi model berhasil melampaui target akurasi ≥ 80%
-- Model terbaik **Word2Vec + LinearSVC** mencapai akurasi **82.9%** dan F1 Macro **0.8511**
-- Depression dan Suicidal masih memiliki F1 < 0.75 dan sering tertukar satu sama lain (100 kasus suicidal → depression, 88 kasus depression → suicidal)
+- Semua 4 kombinasi model berhasil melampaui target akurasi ≥ 80% dan F1 Macro ≥ 0.75
+- Model terbaik **Word2Vec + LinearSVC** mencapai akurasi **82.9%** dan F1 Macro **0.851**
+- Depression (F1 0.636) dan Suicidal (F1 0.661) masih di bawah target 0.75 dan sering tertukar satu sama lain (466 kasus depression → suicidal, 415 kasus suicidal → depression)
 
 ---
 
@@ -166,9 +186,9 @@ Token eksklusif diidentifikasi via Word2Vec `most_similar()` — kata yang hanya
 
 1. **Tangani Class Imbalance** — Gunakan SMOTE atau augmentasi data khususnya untuk kelas *depression* dan *suicidal* yang memiliki F1 rendah
 2. **Eksperimen Transformer** — Coba IndoBERT atau mBERT yang dioptimasi untuk Bahasa Indonesia
-3. **Perluas Dataset** — Tambah data kelas minoritas (*personality disorder* = 730, *stress* = 1.046)
+3. **Perluas Dataset** — Tambah data khususnya kelas *bipolar* (966 data, paling sedikit)
 4. **Feature Engineering** — Tambahkan fitur sentimen, intensitas emosi, dan fitur pragmatik
-5. **Strategi Anti-Overlap** — Kembangkan strategi khusus untuk membedakan pasangan *suicidal ↔ depression* dan *normal ↔ suicidal*
+5. **Strategi Anti-Overlap** — Kembangkan strategi khusus untuk membedakan pasangan *depression ↔ suicidal* (881 kasus tertukar) dan *normal ↔ depression/suicidal* (195 kasus)
 6. **Validasi Klinis** — Validasi model dengan psikolog atau profesional kesehatan mental sebelum deployment
 
 ---
@@ -183,7 +203,7 @@ cortisoul/
 │   └── 📁 nb_images/                     # Gambar visualisasi dari notebook
 │
 ├── 📁 data/
-│   └── data_setelah_Preprocessing.csv    # Dataset hasil preprocessing
+│   └── clean_processed.csv               # Dataset hasil preprocessing
 │
 ├── Notebook_CortiSoul_Data_Science.ipynb # Notebook analisis lengkap
 ├── README.md                             # Dokumentasi proyek
@@ -219,7 +239,7 @@ streamlit run cortisoul_dashboard.py
 
 Dashboard akan otomatis terbuka di `http://localhost:8501`
 
-> **Catatan:** Pastikan file `data_setelah_Preprocessing.csv` ada di folder `data/` agar grafik distribusi dan histogram panjang teks menampilkan data aktual (bukan estimasi fallback dari notebook).
+> **Catatan:** Pastikan file `clean_processed.csv` ada di folder `data/` agar grafik distribusi dan histogram panjang teks menampilkan data aktual (bukan estimasi fallback dari notebook).
 
 ---
 

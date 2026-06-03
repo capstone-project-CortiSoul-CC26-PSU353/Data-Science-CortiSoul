@@ -473,7 +473,7 @@ def _get_stats(df):
         'total_data_awal': 9163,     # data mentah setelah translasi ke Bahasa Indonesia
         'total_data': 9151,          # data setelah preprocessing (clean_processed.csv)
         'data_bersih': 9151, 'data_setelah_filter': 9151,
-        'jumlah_kolom': 10, 'missing_values': 8, 'duplikat_teks': 68,
+        'jumlah_kolom': 10, 'missing_values': 27, 'duplikat_teks': 68,
         'fitur_unik': 5000, 'min_panjang': 4, 'max_panjang': 5902,
         'median_panjang': 217, 'mean_panjang': 465,
     }
@@ -599,7 +599,7 @@ if page == "🏠 Overview":
         with ci1: st.metric("Data Awal (Terjemahan)", f"{stats['total_data_awal']:,}", "dari 103.488 data asli")
         with ci2: st.metric("Data Setelah Preprocessing", f"{stats['total_data']:,}")
         with ci3: st.metric("Jumlah Kolom", "10", "text, status, + 8 lainnya")
-        with ci4: st.metric("Missing Values", "8", "clean_text / lower / normalized")
+        with ci4: st.metric("Missing Values", "27", "tersebar di 6 kolom")
         st.warning("⚠️ File data tidak ditemukan di folder `../data/`. Letakkan `data_setelah_Preprocessing.csv` di sana.")
 
     st.markdown('<div class="section-header">Gambaran Proyek</div>', unsafe_allow_html=True)
@@ -676,7 +676,7 @@ elif page == "📂 Dataset":
         with d1: st.metric("Total Entri (Awal)", "9,163", "sebelum cleaning")
         with d2: st.metric("Total Kolom", "10")
         with d3: st.metric("Jumlah Kelas", "7")
-        with d4: st.metric("Missing Values", "8", "clean_text/lower/normalized")
+        with d4: st.metric("Missing Values", "27", "tersebar di 6 kolom")
     else:
         r, c = df_raw.shape
         d1, d2, d3, d4 = st.columns(4)
@@ -857,7 +857,7 @@ elif page == "📊 Distribusi Data":
     _min_p     = stats['min_panjang'];   _max_p    = stats['max_panjang']
 
     st.markdown(f"""
-    <div class="warning-box">⚠️ <b>8 missing values</b> ditemukan pada kolom <i>clean_text</i>, <i>lower</i>, dan <i>normalized</i> — perlu ditangani sebelum pemodelan.</div>
+    <div class="warning-box">⚠️ <b>27 missing values</b> tersebar di 6 kolom: <i>clean_text</i>, <i>lower</i>, <i>normalized</i> (masing-masing 1), serta <i>text_no_stopword</i>, <i>text_stemmed</i>, <i>text_preprocessed</i> (masing-masing 8) — berasal dari 8 baris yang gagal diproses saat stemming/stopword removal.</div>
     <div class="warning-box">⚠️ <b>12 data duplikat</b> ditemukan dari total 9.163 data (sebelum cleaning) — dihapus pada tahap cleaning, tersisa 9.151 data. Selain itu terdapat <b>68 duplikat teks</b> pada kolom tokens.</div>
     <div class="insight-box">📏 <b>Variasi panjang teks tinggi:</b> Min {_min_p} karakter hingga {_max_p:,} karakter. Median ({_med}) jauh di bawah mean ({_mean_val}), menunjukkan distribusi right-skewed.</div>
     <div class="insight-box">📊 <b>Distribusi kelas:</b> Suicidal ({label_dist.get('suicidal',0):,}, 18.1%) paling banyak, Bipolar ({label_dist.get('bipolar',0):,}, 10.6%) paling sedikit. Rasio imbalance ringan → tidak perlu SMOTE.</div>
