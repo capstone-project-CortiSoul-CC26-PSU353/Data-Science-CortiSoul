@@ -49,6 +49,13 @@ Dalam lingkungan akademik dan profesional, banyak individu mengalami tekanan tin
 | **Jumlah kelas** | 7 kondisi mental |
 | **Missing values** | 27 (tersebar di 6 kolom) |
 
+**Catatan kolom:**
+> - `text` dan `status` merupakan kolom **asli** dari dataset.
+> - `length` merupakan kolom **fitur tambahan** yang dihitung dari panjang karakter `text`.
+> - `clean_text`, `lower`, `normalized`, `tokens`, `text_no_stopword`, `text_stemmed`, dan `text_preprocessed` merupakan kolom **hasil preprocessing** yang dihasilkan secara bertahap melalui proses pembersihan teks, normalisasi, tokenisasi, penghapusan stopword, dan stemming.
+> - `text_preprocessed` adalah kolom **output akhir** preprocessing yang digunakan sebagai input model klasifikasi.
+> - 12 entri dihapus selama preprocessing (9.163 → 9.151) akibat adanya missing values atau duplikat.
+
 ### Distribusi Kelas
 
 | Kondisi Mental | Jumlah Data | Persentase |
